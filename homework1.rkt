@@ -133,8 +133,47 @@
 
 ; Problem 9
 (define (rainfall [lstRain : (listof number)]) : number
-    0
+    (rainfallHelper lstRain 0 0 #f)
+)
+
+(define (rainfallHelper [lstRain : (listof number)] [sum : number] [count : number] [flag : boolean]) : number
+    (cond
+        [(empty? lstRain)
+            (/ sum count)
+        ]
+        [(cons? lstRain)
+            (if (not flag)
+                (rainfallHelper (rest lstRain) sum count (= (first lstRain) -999))
+                (if (>= (first lstRain) 0)
+                    (rainfallHelper (rest lstRain) (+ sum (first lstRain)) (+ count 1) flag)
+                    (rainfallHelper (rest lstRain) sum count flag)
+                )
+            )
+        ]
+    )
 )
 
 (test (rainfall (list 1 2 3 4 5 -999 0.5 0 0.75 1 0.75 0)) 0.5)
 (test (rainfall (list 1 2 3 4 5 -999 1.5 -1 0 0.5 -2 1 1)) 0.8)
+
+; Problem 10
+(define-type CartItem
+    [item
+        (name : string)
+        (price : number)
+    ]
+)
+
+(define (checkout [cart : (listof CartItem)]) : number
+    (checkoutHelper cart 0 0 0)
+)
+
+(define (checkoutHelper [cart : (listof CartItem)] [sum : number] [hatSum : number] [shoeCount : number]) : number
+    (cond
+        [(empty? cart) (- (- sum (if (>= shoeCount 2) 10 0)) (* hatSum (if (>= hatSum 100) 0.2 0)))]
+        [(cons? cart) (checkoutHelper (rest cart) (+ sum (item-price (first cart))) (+ hatSum (if (string=? (item-name (first cart)) "hat") (item-price (first cart)) 0)) (+ shoeCount (if (string=? (item-name (first cart)) "shoes") 1 0)))]
+    )
+)
+
+(test (checkout (list (item "hat" 25) (item "bag" 50) (item "hat" 85) (item "shoes" 15))) 153)
+(test (checkout (list (item "hat" 15) (item "shoes" 75) (item "hat" 25) (item "shoes" 60))) 165)
