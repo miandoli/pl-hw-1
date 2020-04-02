@@ -1,6 +1,12 @@
+; Programming Languages: Homework 1
+; Matthew Iandoli (mjiandoli)
+; April 2, 2020
+
 #lang plai-typed
 
 ; Problem #1
+
+; Sums a list of numbers
 (define (sum [lstNum : (listof number)]) : number
     (foldl + 0 lstNum)
 )
@@ -10,6 +16,8 @@
 (test (sum (list -1 2 5 0 -3)) 3)
 
 ; Problem #2
+
+; Sums a list of numbers whose values are between -5 and -2 (inclusively)
 (define (sum-inrange [lstNum : (listof number)]) : number
     (foldl + 0 (filter (lambda ([val : number]) (and (>= val -5) (<= val -2))) lstNum))
 )
@@ -20,6 +28,8 @@
 (test (sum-inrange empty) 0)
 
 ; Problem #3
+
+; Checks if the first string starts with the second string
 (define (startswith? [strTotal : string] [strStart : string]) : boolean
     (if (> (string-length strStart) (string-length strTotal))
         #f
@@ -34,6 +44,8 @@
 (test (startswith? "Apple" "some bigger string than the previous") #f)
 
 ; Problem 4
+
+; Replaces all strings in a list starting with 'P' with "none"
 (define (replaceP [lstStr : (listof string)]) : (listof string)
     (map (lambda ([str : string]) (if (string=? (substring str 0 1) "P") "none" str)) lstStr)
 )
@@ -44,11 +56,13 @@
 (test (replaceP empty) empty)
 
 ; Problem 5
-(define (alternating lstElems)
+
+; Removes all even (and zero) index elements from a list
+(define (alternating [lstElems : (listof 'a)]) : (listof 'a)
     (alternatingHelper lstElems #t (list))
 )
 
-(define (alternatingHelper lstElems [alt : boolean] lstResult)
+(define (alternatingHelper [lstElems : (listof 'a)] [alt : boolean] lstResult) : (listof 'a)
     (cond
         [(empty? lstElems) lstResult]
         [(cons? lstElems) (alternatingHelper (rest lstElems) (not alt) (if alt lstResult (append lstResult (list (first lstElems)))))]
@@ -83,6 +97,8 @@
 )
 
 ; Problem 7
+
+; Updates the hasExtraPoints boolean of any student with all grades above 80
 (define (assign-points [lstStudents : (listof Student)]) : (listof Student)
     (map
         (lambda ([s : Student])
@@ -107,6 +123,8 @@
 (test (assign-points (list (undergrad "Matt" (scores 100 95 90 #f) 2021) (graduate "Bob" (scores 90 85 80 #f) "MS"))) (list (undergrad "Matt" (scores 100 95 90 #t) 2021) (graduate "Bob" (scores 90 85 80 #f) "MS")))
 
 ; Problem 8
+
+; Determines if all PhD students have extra points
 (define (all-phd-haveextra? [lstStudents : (listof Student)]) : boolean
     (foldl
         (lambda ([b : boolean] [extra : boolean])
@@ -132,6 +150,8 @@
 (test (all-phd-haveextra? (assign-points lstGrad2)) #f)
 
 ; Problem 9
+
+; Finds the average rainfall from a list of numbers that follow -999
 (define (rainfall [lstRain : (listof number)]) : number
     (rainfallHelper lstRain 0 0 #f)
 )
@@ -139,7 +159,10 @@
 (define (rainfallHelper [lstRain : (listof number)] [sum : number] [count : number] [flag : boolean]) : number
     (cond
         [(empty? lstRain)
-            (/ sum count)
+            (if (> count 0)
+                (/ sum count)
+                0
+            )
         ]
         [(cons? lstRain)
             (if (not flag)
@@ -155,6 +178,7 @@
 
 (test (rainfall (list 1 2 3 4 5 -999 0.5 0 0.75 1 0.75 0)) 0.5)
 (test (rainfall (list 1 2 3 4 5 -999 1.5 -1 0 0.5 -2 1 1)) 0.8)
+(test (rainfall (list 1 2 3 4 5)) 0)
 
 ; Problem 10
 (define-type CartItem
@@ -164,6 +188,9 @@
     ]
 )
 
+; Produces the total cost of a shopping cart (list of items)
+; (i) if the cart contains at least $100 worth of hats, take 20% off the cost of all hats (match only items whose exact name is "hat")
+; (ii) if the cart contains at least two shoes, take $10 off the total of the cart (match only items whose exact name is "shoes")
 (define (checkout [cart : (listof CartItem)]) : number
     (checkoutHelper cart 0 0 0)
 )
